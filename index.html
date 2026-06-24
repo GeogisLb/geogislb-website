@@ -1,1 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeogisLB — Mapping & Geospatial Solutions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --navy:   #0B1628;
+      --navy2:  #0F1F3D;
+      --teal:   #00C9A7;
+      --teal2:  #00A88A;
+      --gold:   #F6C90E;
+      --white:  #F0F4F8;
+      --slate:  #8899AA;
+      --card:   #131F35;
+      --border: rgba(0,201,167,0.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 6vw;
+      height: 72px;
+      background: rgba(11,22,40,0.82);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      transition: background .3s;
+    }
+
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em;
+      color: var(--white); text-decoration: none;
+    }
+    .nav-logo span { color: var(--teal); }
+
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      font-size: .88rem; font-weight: 500; letter-spacing: .04em;
+      color: var(--slate); text-decoration: none; text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--teal); }
+
+    .nav-cta {
+      background: var(--teal); color: var(--navy);
+      border: none; border-radius: 6px;
+      padding: .55rem 1.3rem; font-family: 'Space Grotesk', sans-serif;
+      font-size: .85rem; font-weight: 700; cursor: pointer;
+      transition: background .2s, transform .15s;
+      text-decoration: none;
+    }
+    .nav-cta:hover { background: #00dbb8; transform: translateY(-1px); }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: var(--white); border-radius: 2px; }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 120px 6vw 80px;
+      overflow: hidden;
+    }
+
+    /* Animated topographic SVG background */
+    #topo-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      opacity: .18;
+    }
+
+    #topo-bg path {
+      fill: none;
+      stroke: var(--teal);
+      stroke-width: 1.5;
+      animation: topoFlow 8s ease-in-out infinite alternate;
+    }
+    #topo-bg path:nth-child(even) { animation-delay: -2s; }
+    #topo-bg path:nth-child(3n)   { animation-delay: -5s; opacity: .6; }
+
+    @keyframes topoFlow {
+      from { stroke-dashoffset: 0; }
+      to   { stroke-dashoffset: 80; }
+    }
+
+    /* Glowing orb */
+    .hero-orb {
+      position: absolute; right: -80px; top: 50%;
+      transform: translateY(-50%);
+      width: 580px; height: 580px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,201,167,.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 2; max-width: 700px; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .6rem;
+      background: rgba(0,201,167,.1); border: 1px solid var(--border);
+      border-radius: 100px; padding: .35rem 1rem;
+      font-size: .78rem; font-weight: 500; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1.8rem;
+    }
+    .hero-eyebrow::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal); animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .4; transform: scale(.7); }
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+      font-weight: 700; line-height: 1.1; letter-spacing: -.03em;
+      margin-bottom: 1.4rem;
+    }
+    h1 .accent { color: var(--teal); }
+    h1 .underline-gold {
+      position: relative; display: inline-block;
+    }
+    h1 .underline-gold::after {
+      content: '';
+      position: absolute; left: 0; bottom: -6px; width: 100%; height: 4px;
+      background: var(--gold); border-radius: 2px;
+    }
+
+    .hero-desc {
+      font-size: 1.1rem; line-height: 1.75;
+      color: var(--slate); max-width: 540px; margin-bottom: 2.4rem;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--teal); color: var(--navy);
+      padding: .85rem 2rem; border-radius: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .95rem; font-weight: 700;
+      text-decoration: none; transition: all .2s;
+      border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: .5rem;
+    }
+    .btn-primary:hover { background: #00dbb8; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,201,167,.35); }
+
+    .btn-outline {
+      background: transparent; color: var(--white);
+      padding: .85rem 2rem; border-radius: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .95rem; font-weight: 600;
+      text-decoration: none; border: 1px solid rgba(240,244,248,.22);
+      transition: all .2s; cursor: pointer;
+      display: inline-flex; align-items: center; gap: .5rem;
+    }
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+    .hero-stats {
+      display: flex; gap: 2.8rem; margin-top: 3.5rem;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+    }
+    .stat-item .num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem; font-weight: 700; color: var(--white);
+    }
+    .stat-item .num span { color: var(--teal); }
+    .stat-item .lbl { font-size: .78rem; color: var(--slate); margin-top: .2rem; letter-spacing: .05em; text-transform: uppercase; }
+
+    /* ── SECTION BASE ── */
+    section { padding: 100px 6vw; }
+
+    .section-tag {
+      font-size: .75rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--teal); font-weight: 600; margin-bottom: 1rem;
+    }
+    .section-heading {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700; letter-spacing: -.02em; line-height: 1.2;
+    }
+    .section-sub {
+      font-size: 1rem; color: var(--slate); line-height: 1.7;
+      max-width: 520px; margin-top: .8rem;
+    }
+    .section-header { margin-bottom: 3.5rem; }
+
+    /* ── WHY GEOGIS ── */
+    #why { background: linear-gradient(180deg, var(--navy) 0%, var(--navy2) 100%); }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .why-text .lead {
+      font-size: 1.05rem; line-height: 1.8; color: #C8D8E8;
+      margin-bottom: 1.6rem;
+    }
+    .why-pillars {
+      display: flex; flex-direction: column; gap: 1rem; margin-top: 1.6rem;
+    }
+    .pillar {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: rgba(255,255,255,.04); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem 1.2rem;
+    }
+    .pillar-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(0,201,167,.15);
+      display: grid; place-items: center; flex-shrink: 0;
+      font-size: 1rem;
+    }
+    .pillar-body h4 { font-family: 'Space Grotesk', sans-serif; font-size: .95rem; font-weight: 600; margin-bottom: .2rem; }
+    .pillar-body p  { font-size: .82rem; color: var(--slate); line-height: 1.5; }
+
+    .why-visual {
+      position: relative; border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--card);
+      min-height: 420px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .why-visual svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+    .why-badge {
+      position: absolute; bottom: 1.5rem; left: 1.5rem;
+      background: rgba(11,22,40,.85); backdrop-filter: blur(8px);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: .8rem 1.2rem; z-index: 2;
+    }
+    .why-badge .b-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--teal); }
+    .why-badge .b-lbl { font-size: .74rem; color: var(--slate); text-transform: uppercase; letter-spacing: .06em; }
+
+    /* ── SERVICES ── */
+    #services { background: var(--navy); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.4rem;
+    }
+    .service-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 1.6rem;
+      transition: transform .25s, border-color .25s, box-shadow .25s;
+      cursor: default;
+    }
+    .service-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--teal);
+      box-shadow: 0 12px 36px rgba(0,201,167,.12);
+    }
+    .service-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      background: rgba(0,201,167,.12);
+      display: grid; place-items: center;
+      margin-bottom: 1.3rem; font-size: 1.5rem;
+    }
+    .service-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem; font-weight: 700; margin-bottom: .7rem;
+    }
+    .service-card p { font-size: .87rem; color: var(--slate); line-height: 1.65; }
+    .service-link {
+      display: inline-flex; align-items: center; gap: .3rem;
+      margin-top: 1.2rem; font-size: .82rem; font-weight: 600;
+      color: var(--teal); text-decoration: none;
+      transition: gap .2s;
+    }
+    .service-link:hover { gap: .6rem; }
+
+    /* ── VISION / MISSION ── */
+    #vision { background: var(--navy2); }
+
+    .vm-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+    }
+    .vm-card {
+      border-radius: 16px; padding: 2.4rem;
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .vm-card.vision-card { background: linear-gradient(135deg, var(--card) 0%, rgba(0,201,167,.07) 100%); }
+    .vm-card.mission-card { background: linear-gradient(135deg, var(--card) 0%, rgba(246,201,14,.05) 100%); }
+    .vm-card .vm-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .7rem; font-weight: 700; letter-spacing: .18em;
+      text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .vision-card .vm-label { color: var(--teal); }
+    .mission-card .vm-label { color: var(--gold); }
+    .vm-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem;
+    }
+    .vm-card p { font-size: .9rem; color: #A8BDD0; line-height: 1.75; }
+
+    .mission-list { list-style: none; margin-top: 1.2rem; display: flex; flex-direction: column; gap: .7rem; }
+    .mission-list li {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .87rem; color: #A8BDD0; line-height: 1.5;
+    }
+    .mission-list li::before {
+      content: '→'; color: var(--gold); flex-shrink: 0; font-size: .9rem; margin-top: .1rem;
+    }
+
+    /* ── CTA STRIP ── */
+    #cta-strip {
+      background: linear-gradient(135deg, var(--teal2) 0%, var(--teal) 100%);
+      padding: 80px 6vw;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 2rem; flex-wrap: wrap;
+    }
+    #cta-strip .cta-text h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 700; color: var(--navy); letter-spacing: -.02em;
+    }
+    #cta-strip .cta-text p { color: rgba(11,22,40,.7); margin-top: .5rem; font-size: .95rem; }
+
+    .btn-dark {
+      background: var(--navy); color: var(--white);
+      padding: .9rem 2.2rem; border-radius: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .95rem; font-weight: 700;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: all .2s; white-space: nowrap;
+    }
+    .btn-dark:hover { background: var(--navy2); transform: translateY(-2px); }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--navy); }
+
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+
+    .contact-info .ci-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+    .ci-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(0,201,167,.12); border: 1px solid var(--border);
+      display: grid; place-items: center; font-size: 1.1rem; flex-shrink: 0;
+    }
+    .ci-item h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: .92rem; margin-bottom: .2rem; }
+    .ci-item p, .ci-item a { font-size: .87rem; color: var(--slate); text-decoration: none; }
+    .ci-item a:hover { color: var(--teal); }
+
+    .socials { display: flex; gap: .8rem; margin-top: 2rem; }
+    .social-btn {
+      width: 40px; height: 40px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card);
+      display: grid; place-items: center; cursor: pointer;
+      font-size: .9rem; text-decoration: none; color: var(--slate);
+      transition: all .2s;
+    }
+    .social-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+    .contact-form {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2.4rem;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; }
+    .form-group label { font-size: .78rem; font-weight: 600; color: var(--slate); text-transform: uppercase; letter-spacing: .05em; }
+    .form-group input, .form-group select, .form-group textarea {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px; padding: .75rem 1rem; color: var(--white);
+      font-family: 'Inter', sans-serif; font-size: .9rem;
+      outline: none; transition: border-color .2s;
+      width: 100%;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--teal); background: rgba(0,201,167,.05);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group select option { background: var(--navy2); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #070F1D; padding: 60px 6vw 32px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-top {
+      display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 2.5rem; margin-bottom: 3rem;
+    }
+    .footer-brand p { font-size: .85rem; color: var(--slate); line-height: 1.7; margin-top: .8rem; max-width: 240px; }
+
+    .footer-col h5 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .8rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1.2rem;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .footer-col ul a { font-size: .87rem; color: var(--slate); text-decoration: none; transition: color .2s; }
+    .footer-col ul a:hover { color: var(--white); }
+
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+      border-top: 1px solid var(--border); padding-top: 1.6rem;
+    }
+    .footer-bottom p { font-size: .8rem; color: var(--slate); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .why-grid, .vm-grid, .contact-grid { grid-template-columns: 1fr; }
+      .why-visual { min-height: 260px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .hero-stats { gap: 1.6rem; }
+    }
+    @media (max-width: 640px) {
+      nav { padding: 0 1.4rem; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      section { padding: 72px 5vw; }
+      h1 { font-size: 2.1rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .hero-stats { flex-wrap: wrap; gap: 1.4rem; }
+      #cta-strip { text-align: center; justify-content: center; }
+    }
+
+    /* Map pin animated element */
+    @keyframes bounce-pin {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .map-pin-anim { animation: bounce-pin 2.4s ease-in-out infinite; }
+
+    /* Scroll fade-in */
+    .fade-up {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Geo<span>GIS</span>LB</a>
+  <ul class="nav-links">
+    <li><a href="#why">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#vision">Vision</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="tel:+96176479725" class="nav-cta">+961 76 479 725</a>
+  <div class="hamburger" onclick="this.classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <!-- Animated topographic contour lines -->
+  <svg id="topo-bg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <style>
+        .c { fill:none; stroke: #00C9A7; stroke-width:1.2; }
+      </style>
+    </defs>
+    <!-- Contour lines simulating topographic map -->
+    <path class="c" d="M-50,350 Q150,200 300,280 Q450,360 600,240 Q750,120 900,200 Q1050,280 1250,180" style="stroke-dasharray:8,6;animation:topoFlow 7s linear infinite alternate"/>
+    <path class="c" d="M-50,400 Q100,280 280,340 Q460,400 620,290 Q780,180 920,260 Q1060,340 1250,240" style="stroke-dasharray:12,8;animation:topoFlow 9s linear infinite alternate-reverse"/>
+    <path class="c" d="M-50,450 Q120,340 300,400 Q480,460 640,350 Q800,240 960,320 Q1100,400 1250,300" style="stroke-dasharray:6,10;animation:topoFlow 11s linear infinite alternate"/>
+    <path class="c" d="M-50,500 Q140,390 320,450 Q500,510 660,400 Q820,290 980,370 Q1120,450 1250,360" style="stroke-dasharray:14,6;animation:topoFlow 8s linear infinite alternate-reverse"/>
+    <path class="c" d="M-50,300 Q200,160 360,240 Q520,320 680,200 Q840,80 1000,160 Q1130,230 1250,130" style="stroke-dasharray:10,8;animation:topoFlow 10s linear infinite alternate"/>
+    <path class="c" d="M-50,250 Q180,110 360,190 Q540,270 700,150 Q860,30 1020,110 Q1150,180 1250,90" style="stroke-dasharray:8,12;animation:topoFlow 12s linear infinite alternate-reverse"/>
+    <path class="c" d="M-50,550 Q160,440 340,500 Q520,560 680,450 Q840,340 1000,420 Q1140,500 1250,410" style="stroke-dasharray:16,6;animation:topoFlow 6s linear infinite alternate"/>
+    <path class="c" d="M-50,600 Q200,490 380,550 Q560,610 720,500 Q880,390 1040,470 Q1170,550 1250,460" style="stroke-dasharray:8,14;animation:topoFlow 13s linear infinite alternate-reverse"/>
+    <!-- Grid cross-hair marks -->
+    <line class="c" x1="600" y1="0" x2="600" y2="700" style="opacity:.08;stroke-dasharray:4,12"/>
+    <line class="c" x1="0" y1="350" x2="1200" y2="350" style="opacity:.08;stroke-dasharray:4,12"/>
+    <circle class="c" cx="600" cy="350" r="40" style="opacity:.15;stroke-dasharray:6,6"/>
+    <circle class="c" cx="600" cy="350" r="90" style="opacity:.1;stroke-dasharray:6,10"/>
+    <circle class="c" cx="600" cy="350" r="150" style="opacity:.07;stroke-dasharray:6,16"/>
+  </svg>
+
+  <div class="hero-orb"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Tripoli, Lebanon · Est. 2019</div>
+    <h1>
+      Mapping the World<br>
+      with <span class="accent">Scientific</span><br>
+      <span class="underline-gold">Precision</span>
+    </h1>
+    <p class="hero-desc">
+      GeogisLB is a geospatial consultancy delivering high-quality maps, GIS solutions,
+      and geographic data services — empowering organizations to make better, data-driven decisions worldwide.
+    </p>
+    <div class="hero-actions">
+      <a href="#services" class="btn-primary">
+        Explore Services
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#contact" class="btn-outline">Get in Touch</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="num">6<span>+</span></div><div class="lbl">Years Active</div></div>
+      <div class="stat-item"><div class="num">50<span>+</span></div><div class="lbl">Projects Mapped</div></div>
+      <div class="stat-item"><div class="num">10<span>+</span></div><div class="lbl">Countries Served</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO WE ARE / WHY GEOGIS -->
+<section id="why">
+  <div class="why-grid">
+    <div class="why-text fade-up">
+      <div class="section-tag">Who We Are</div>
+      <h2 class="section-heading">Built to Bring <br>Geographic Justice</h2>
+      <p class="lead" style="margin-top:1rem">
+        The root of many global challenges — environmental degradation, poverty, poor policy — is the absence of accurate, scientific geographic data.
+        GeogisLB was founded to change that: delivering precise geospatial intelligence that drives fair, evidence-based decisions.
+      </p>
+      <div class="why-pillars">
+        <div class="pillar">
+          <div class="pillar-icon">🗺️</div>
+          <div class="pillar-body">
+            <h4>Expert Consultancy Team</h4>
+            <p>A multidisciplinary team of geographers, GIS specialists, and CAD engineers.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">📡</div>
+          <div class="pillar-body">
+            <h4>Advanced Technology</h4>
+            <p>CAD, GPS, drone surveying, and custom GIS software tailored to each client.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">🌍</div>
+          <div class="pillar-body">
+            <h4>Global Reach</h4>
+            <p>Mapping and commercial design services delivered worldwide from Lebanon.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="why-visual fade-up">
+      <!-- Interactive SVG map illustration -->
+      <svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#00C9A7" stop-opacity=".2"/>
+            <stop offset="100%" stop-color="#00C9A7" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="210" cy="210" r="210" fill="url(#glow)"/>
+        <!-- Grid lines -->
+        <line x1="0" y1="70" x2="420" y2="70" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="0" y1="140" x2="420" y2="140" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="0" y1="210" x2="420" y2="210" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="0" y1="280" x2="420" y2="280" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="0" y1="350" x2="420" y2="350" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="70" y1="0" x2="70" y2="420" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="140" y1="0" x2="140" y2="420" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="210" y1="0" x2="210" y2="420" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="280" y1="0" x2="280" y2="420" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <line x1="350" y1="0" x2="350" y2="420" stroke="#00C9A7" stroke-width=".6" stroke-dasharray="4,8" opacity=".3"/>
+        <!-- Contour-style terrain regions -->
+        <path d="M80,300 Q140,220 200,240 Q260,260 300,200 Q340,140 360,160 L380,380 L60,380 Z" fill="rgba(0,201,167,.07)" stroke="#00C9A7" stroke-width=".8" opacity=".6"/>
+        <path d="M120,300 Q170,240 220,260 Q270,280 310,220 Q340,170 355,185 L370,370 L90,370 Z" fill="rgba(0,201,167,.05)" stroke="#00C9A7" stroke-width=".8" opacity=".4"/>
+        <path d="M60,340 Q120,280 180,300 Q240,320 290,260 Q330,200 360,215 L375,375 L45,375 Z" fill="rgba(0,201,167,.03)" stroke="#00C9A7" stroke-width=".8" opacity=".3"/>
+        <!-- Road-like lines -->
+        <path d="M40,210 Q130,195 210,210 Q290,225 380,210" fill="none" stroke="rgba(246,201,14,.4)" stroke-width="1.5"/>
+        <path d="M210,40 Q215,130 210,210 Q205,290 210,380" fill="none" stroke="rgba(246,201,14,.4)" stroke-width="1.5"/>
+        <!-- Animated map pin for Tripoli -->
+        <g class="map-pin-anim" transform="translate(210,180)">
+          <circle cx="0" cy="0" r="16" fill="rgba(0,201,167,.25)" opacity="1">
+            <animate attributeName="r" values="14;22;14" dur="2.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".35;0;.35" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="0" r="8" fill="#00C9A7"/>
+          <path d="M0,-18 Q8,-18 8,-8 Q8,0 0,12 Q-8,0 -8,-8 Q-8,-18 0,-18 Z" fill="#00C9A7"/>
+          <circle cx="0" cy="-8" r="3.5" fill="#0B1628"/>
+        </g>
+        <!-- Small location dots -->
+        <circle cx="140" cy="160" r="3" fill="#F6C90E" opacity=".7"/>
+        <circle cx="290" cy="140" r="3" fill="#F6C90E" opacity=".7"/>
+        <circle cx="320" cy="290" r="3" fill="#F6C90E" opacity=".5"/>
+        <circle cx="100" cy="270" r="2.5" fill="#F6C90E" opacity=".5"/>
+        <!-- Compass rose -->
+        <g transform="translate(355,55)">
+          <circle cx="0" cy="0" r="22" fill="rgba(11,22,40,.6)" stroke="rgba(0,201,167,.3)" stroke-width="1"/>
+          <text x="0" y="-9" text-anchor="middle" fill="#00C9A7" font-size="8" font-family="Space Grotesk,sans-serif" font-weight="700">N</text>
+          <text x="0" y="14" text-anchor="middle" fill="rgba(0,201,167,.5)" font-size="6" font-family="Space Grotesk,sans-serif">S</text>
+          <text x="-14" y="3" text-anchor="middle" fill="rgba(0,201,167,.5)" font-size="6" font-family="Space Grotesk,sans-serif">W</text>
+          <text x="14" y="3" text-anchor="middle" fill="rgba(0,201,167,.5)" font-size="6" font-family="Space Grotesk,sans-serif">E</text>
+          <line x1="0" y1="-16" x2="0" y2="-4" stroke="#00C9A7" stroke-width="1.5"/>
+          <line x1="0" y1="4" x2="0" y2="16" stroke="rgba(0,201,167,.4)" stroke-width="1"/>
+          <line x1="-16" y1="0" x2="-4" y2="0" stroke="rgba(0,201,167,.4)" stroke-width="1"/>
+          <line x1="4" y1="0" x2="16" y2="0" stroke="rgba(0,201,167,.4)" stroke-width="1"/>
+        </g>
+        <!-- Scale bar -->
+        <g transform="translate(40,390)">
+          <rect x="0" y="-3" width="60" height="3" rx="1" fill="#00C9A7" opacity=".5"/>
+          <text x="0" y="-8" fill="#8899AA" font-size="7" font-family="Inter,sans-serif">0</text>
+          <text x="55" y="-8" fill="#8899AA" font-size="7" font-family="Inter,sans-serif">50 km</text>
+        </g>
+      </svg>
+
+      <div class="why-badge">
+        <div class="b-val">Tripoli</div>
+        <div class="b-lbl">North Lebanon · HQ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header fade-up">
+    <div class="section-tag">What We Do</div>
+    <h2 class="section-heading">Our Services</h2>
+    <p class="section-sub">From precision mapping to GIS training, we cover the full geospatial lifecycle.</p>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card fade-up">
+      <div class="service-icon">🗺️</div>
+      <h3>Mapping & Cartography</h3>
+      <p>High-precision topographic, thematic, and urban maps created with GPS and drone technology for any scale or format.</p>
+      <a href="#contact" class="service-link">Learn more →</a>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">🏗️</div>
+      <h3>Commercial Designing</h3>
+      <p>CAD-based site plans, layout designs, and spatial visualizations for commercial, industrial, and real estate projects.</p>
+      <a href="#contact" class="service-link">Learn more →</a>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">💻</div>
+      <h3>GIS Integration</h3>
+      <p>Database design, geodata management, and seamless GIS platform integration tailored to your organization's workflow.</p>
+      <a href="#contact" class="service-link">Learn more →</a>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">🎓</div>
+      <h3>GIS Education & Training</h3>
+      <p>Hands-on workshops, university partnerships, and professional certification programs in GIS and remote sensing.</p>
+      <a href="#contact" class="service-link">Learn more →</a>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">📊</div>
+      <h3>Consultancy & Analysis</h3>
+      <p>Monitoring, evaluation, and strategic advisory for geographic and GIS-intensive infrastructure or environmental projects.</p>
+      <a href="#contact" class="service-link">Learn more →</a>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">📡</div>
+      <h3>Remote Sensing</h3>
+      <p>Satellite imagery analysis, photogrammetry, and aerial survey solutions for agriculture, urban planning, and disaster assessment.</p>
+      <a href="#contact" class="service-link">Learn more →</a>
+    </div>
+  </div>
+</section>
+
+<!-- VISION & MISSION -->
+<section id="vision">
+  <div class="section-header fade-up">
+    <div class="section-tag">Our Direction</div>
+    <h2 class="section-heading">Vision & Mission</h2>
+  </div>
+
+  <div class="vm-grid">
+    <div class="vm-card vision-card fade-up">
+      <div class="vm-label">Our Vision</div>
+      <h3>A world where geographic truth drives every decision</h3>
+      <p>
+        We believe that better access to geographic data is instrumental in developing solutions that resolve issues at organizational, regional, and global levels. 
+        It helps develop sustainable, smart solutions for the environment — and ultimately for humanity.
+      </p>
+    </div>
+    <div class="vm-card mission-card fade-up">
+      <div class="vm-label">Our Mission</div>
+      <h3>Delivering geospatial intelligence where it matters</h3>
+      <ul class="mission-list">
+        <li>Organize and manage the geographic context of your assets and resources.</li>
+        <li>Monitor and evaluate geographic and GIS projects at every stage.</li>
+        <li>Integrate databases with GIS and provide expert training programs.</li>
+        <li>Choose technology based on each client's unique needs — never a one-size-fits-all solution.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CTA STRIP -->
+<div id="cta-strip">
+  <div class="cta-text">
+    <h2>Ready to map your next project?</h2>
+    <p>Let's start a conversation about your geospatial needs.</p>
+  </div>
+  <a href="#contact" class="btn-dark">Start a Project</a>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-header fade-up">
+    <div class="section-tag">Get In Touch</div>
+    <h2 class="section-heading">Contact Us</h2>
+    <p class="section-sub">Based in Tripoli, Lebanon. Available worldwide.</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="contact-info fade-up">
+      <div class="ci-item">
+        <div class="ci-icon">📍</div>
+        <div>
+          <h4>Location</h4>
+          <p>Tripoli, North Lebanon</p>
+        </div>
+      </div>
+      <div class="ci-item">
+        <div class="ci-icon">📞</div>
+        <div>
+          <h4>Phone</h4>
+          <a href="tel:+96176479725">+961 76 479 725</a>
+        </div>
+      </div>
+      <div class="ci-item">
+        <div class="ci-icon">🌐</div>
+        <div>
+          <h4>Website</h4>
+          <a href="https://www.geogislb.com" target="_blank">www.geogislb.com</a>
+        </div>
+      </div>
+      <div class="ci-item">
+        <div class="ci-icon">⏰</div>
+        <div>
+          <h4>Working Hours</h4>
+          <p>Mon – Sat, 9:00 AM – 6:00 PM</p>
+        </div>
+      </div>
+      <div class="socials">
+        <a class="social-btn" href="https://www.linkedin.com/company/geogis-consultant-company" target="_blank" title="LinkedIn">in</a>
+        <a class="social-btn" href="https://instagram.com/geographicstudies" target="_blank" title="Instagram">ig</a>
+        <a class="social-btn" href="https://www.facebook.com/geogisconsultantcompay" target="_blank" title="Facebook">fb</a>
+        <a class="social-btn" href="https://twitter.com/GEOGIS3" target="_blank" title="Twitter / X">𝕏</a>
+      </div>
+    </div>
+
+    <div class="contact-form fade-up">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" placeholder="Ahmad" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" placeholder="Khalil" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="ahmad@company.com" />
+      </div>
+      <div class="form-group">
+        <label>Service Needed</label>
+        <select>
+          <option value="">Select a service…</option>
+          <option>Mapping & Cartography</option>
+          <option>Commercial Designing</option>
+          <option>GIS Integration</option>
+          <option>GIS Education & Training</option>
+          <option>Consultancy & Analysis</option>
+          <option>Remote Sensing</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea placeholder="Tell us about your project…"></textarea>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center" onclick="alert('Thank you! We will be in touch soon.')">
+        Send Message
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-.02em">
+        Geo<span style="color:var(--teal)">GIS</span>LB
+      </div>
+      <p>Mapping and geospatial consultancy delivering scientific precision for organizations and projects worldwide. Est. 2019 — Tripoli, Lebanon.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#why">About Us</a></li>
+        <li><a href="#vision">Vision & Mission</a></li>
+        <li><a href="https://www.geogislb.com/careers">Careers</a></li>
+        <li><a href="https://www.geogislb.com/events">Events</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Services</h5>
+      <ul>
+        <li><a href="#services">Mapping</a></li>
+        <li><a href="#services">Designing</a></li>
+        <li><a href="#services">GIS Integration</a></li>
+        <li><a href="#services">Education</a></li>
+        <li><a href="#services">Consultancy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Connect</h5>
+      <ul>
+        <li><a href="https://www.linkedin.com/company/geogis-consultant-company" target="_blank">LinkedIn</a></li>
+        <li><a href="https://instagram.com/geographicstudies" target="_blank">Instagram</a></li>
+        <li><a href="https://www.facebook.com/geogisconsultantcompay" target="_blank">Facebook</a></li>
+        <li><a href="https://twitter.com/GEOGIS3" target="_blank">Twitter / X</a></li>
+        <li><a href="tel:+96176479725">+961 76 479 725</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 GeogisLB. All rights reserved.</p>
+    <p style="color:rgba(136,153,170,.6);font-size:.75rem">Mapping · GIS · Consultancy · Lebanon</p>
+  </div>
+</footer>
+
+<script>
+  // Scroll fade-in observer
+  const fadeEls = document.querySelectorAll('.fade-up');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  fadeEls.forEach(el => io.observe(el));
+
+  // Nav background on scroll
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    nav.style.background = window.scrollY > 60
+      ? 'rgba(11,22,40,0.97)' : 'rgba(11,22,40,0.82)';
+  });
+</script>
+</body>
+</html>
